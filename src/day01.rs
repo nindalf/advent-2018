@@ -22,6 +22,16 @@ fn compute_dupe_freq(input: &Vec<i32>) -> i32 {
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn test_sum() {
+        assert_eq!(439, super::compute_sum(&input));
+    }
+
+    #[test]
+    fn test_dupe_freq() {
+        assert_eq!(124645, super::compute_dupe_freq(&input));
+    }
+
     lazy_static! {
         static ref input: Vec<i32> = vec![
             16, -15, -2, -6, -6, -17, 3, 11, -5, 19, 16, 10, -4, 10, 7, 5, -8, 7, 10, -15, 16, -8,
@@ -72,14 +82,5 @@ mod tests {
             12, 19, -2, 14, -18, 1, 2, -19, -14, -8, 7, 8, -1, 9, 10, -2, 1, -4, 18, 1, 18, 15, -2,
             14, 10, 18, -15, -2, -7, -7, -3, -12, -4, 18, -7, -6, -3, -124478
         ];
-    }
-    #[test]
-    fn test_sum() {
-        assert_eq!(439, super::compute_sum(&input));
-    }
-
-    #[test]
-    fn test_dupe_freq() {
-        assert_eq!(124645, super::compute_dupe_freq(&input));
     }
 }

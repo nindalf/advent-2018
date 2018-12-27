@@ -51,6 +51,43 @@ fn string_diff(s1: &str, s2: &str) -> (usize, String) {
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn test_count() {
+        let test_input = vec![
+            "abcdef", "bababc", "abbcde", "abcccd", "aabcdd", "abcdee", "ababab",
+        ];
+        assert_eq!(12, super::checksum(test_input));
+        assert_eq!(8610, super::checksum(input.to_vec()));
+    }
+
+    #[test]
+    fn test_correct_id() {
+        let test_input = vec![
+            "abcde", "fghij", "fguij", "klmno", "pqrst", "axcye", "wvxyz",
+        ];
+        assert_eq!(String::from("fgij"), super::correct_id(test_input));
+        assert_eq!(
+            String::from("iosnxmfkpabcjpdywvrtahluy"),
+            super::correct_id(input.to_vec())
+        );
+    }
+
+    #[test]
+    fn test_string_diff() {
+        assert_eq!(
+            (2, String::from("ace")),
+            super::string_diff("abcde", "axcye")
+        );
+        assert_eq!(
+            (0, String::from("abcde")),
+            super::string_diff("abcde", "abcde")
+        );
+        assert_eq!(
+            (1, String::from("fgij")),
+            super::string_diff("fghij", "fguij")
+        );
+        assert_eq!((5, String::from("")), super::string_diff("abcde", "fghij"));
+    }
 
     lazy_static! {
         static ref input: Vec<&'static str> = vec![
@@ -305,43 +342,5 @@ mod tests {
             "iosnxmfkezbcjpdgwsrtaqhzud",
             "iosnxmfyvzbcjpdgwyrtaqhluy"
         ];
-    }
-
-    #[test]
-    fn test_count() {
-        let test_input = vec![
-            "abcdef", "bababc", "abbcde", "abcccd", "aabcdd", "abcdee", "ababab",
-        ];
-        assert_eq!(12, super::checksum(test_input));
-        assert_eq!(8610, super::checksum(input.to_vec()));
-    }
-
-    #[test]
-    fn test_correct_id() {
-        let test_input = vec![
-            "abcde", "fghij", "fguij", "klmno", "pqrst", "axcye", "wvxyz",
-        ];
-        assert_eq!(String::from("fgij"), super::correct_id(test_input));
-        assert_eq!(
-            String::from("iosnxmfkpabcjpdywvrtahluy"),
-            super::correct_id(input.to_vec())
-        );
-    }
-
-    #[test]
-    fn test_string_diff() {
-        assert_eq!(
-            (2, String::from("ace")),
-            super::string_diff("abcde", "axcye")
-        );
-        assert_eq!(
-            (0, String::from("abcde")),
-            super::string_diff("abcde", "abcde")
-        );
-        assert_eq!(
-            (1, String::from("fgij")),
-            super::string_diff("fghij", "fguij")
-        );
-        assert_eq!((5, String::from("")), super::string_diff("abcde", "fghij"));
     }
 }
