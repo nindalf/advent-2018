@@ -9,19 +9,29 @@ struct Cloth {
 }
 
 impl Cloth {
-    fn start_x(self) -> u32 {self.coordinates.0}
-    fn end_x(self) -> u32 {self.coordinates.0 + self.length}
-    fn start_y(self) -> u32 {self.coordinates.1}
-    fn end_y(self) -> u32 {self.coordinates.1 + self.breadth}
-    fn area(self) -> u32 {self.length * self.breadth}
+    fn start_x(self) -> u32 {
+        self.coordinates.0
+    }
+    fn end_x(self) -> u32 {
+        self.coordinates.0 + self.length
+    }
+    fn start_y(self) -> u32 {
+        self.coordinates.1
+    }
+    fn end_y(self) -> u32 {
+        self.coordinates.1 + self.breadth
+    }
+    fn area(self) -> u32 {
+        self.length * self.breadth
+    }
 }
 
 #[allow(dead_code)]
 fn fill_rectangle(clothes: &Vec<Cloth>) -> HashMap<(u32, u32), i32> {
     let mut result = HashMap::new();
     for cloth in clothes {
-        for x in cloth.start_x() .. cloth.end_x() {
-            for y in cloth.start_y() .. cloth.end_y() {
+        for x in cloth.start_x()..cloth.end_x() {
+            for y in cloth.start_y()..cloth.end_y() {
                 let point: (u32, u32) = (x, y);
                 match result.get(&point) {
                     Some(_) => result.insert(point, -1),
@@ -35,25 +45,25 @@ fn fill_rectangle(clothes: &Vec<Cloth>) -> HashMap<(u32, u32), i32> {
 
 #[allow(dead_code)]
 fn count_dupes(big_cloth: &HashMap<(u32, u32), i32>) -> u32 {
-    big_cloth.values()
-        .filter(|x| **x == -1)
-        .count() as u32
+    big_cloth.values().filter(|x| **x == -1).count() as u32
 }
 
 #[allow(dead_code)]
 fn find_perfect(clothes: &Vec<Cloth>, big_cloth: &HashMap<(u32, u32), i32>) -> i32 {
     let mut successes = HashMap::new();
-    big_cloth.values()
-        .filter(|x| **x > 0)
-        .for_each(|x| {
-            match successes.get(&x) {
-                Some(cur) => successes.insert(x, cur + 1),
-                None => successes.insert(x, 1),
-            };
-        });
+    big_cloth.values().filter(|x| **x > 0).for_each(|x| {
+        match successes.get(&x) {
+            Some(cur) => successes.insert(x, cur + 1),
+            None => successes.insert(x, 1),
+        };
+    });
     for cloth in clothes {
         match successes.get(&cloth.id) {
-            Some(fills) => if *fills == cloth.area() {return cloth.id},
+            Some(fills) => {
+                if *fills == cloth.area() {
+                    return cloth.id;
+                }
+            }
             None => continue,
         }
     }
