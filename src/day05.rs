@@ -1,37 +1,4 @@
 #[allow(dead_code)]
-fn polymer_reduction_recursive(s: &mut String) -> String {
-    if s.len() < 2 {
-        return s.to_owned();
-    }
-    let mut second_half = s.split_off(s.len() / 2);
-    let s1 = polymer_reduction_recursive(s);
-    let s2 = polymer_reduction_recursive(&mut second_half);
-    merge(&s1, &s2)
-}
-
-fn merge(s1: &str, s2: &str) -> String {
-    let mut result: Vec<char> = s1.chars().collect();
-    let mut l = s1.len();
-    for (i, c) in s2.chars().enumerate() {
-        if l == 0 {
-            result.extend(s2.chars().skip(i));
-            break;
-        }
-
-        let last = *result.get(l - 1).unwrap();
-        if last.to_ascii_uppercase() == c.to_ascii_uppercase() && last != c {
-            result.remove(l - 1);
-            l = l - 1;
-            continue;
-        }
-
-        result.extend(s2.chars().skip(i));
-        break;
-    }
-    result.iter().collect::<String>()
-}
-
-#[allow(dead_code)]
 fn polymer_reduction_speculative(s: &str) -> usize {
     "abcdefghijklmnopqrstuvwxyz"
         .chars()
@@ -74,14 +41,4 @@ mod tests {
         let speculative_reduced = super::polymer_reduction_speculative(input);
         assert_eq!(5774, speculative_reduced);
     }
-
-    #[test]
-    fn test_merge() {
-        assert_eq!("dabCBA", super::merge("dabAc", "CaCBA"));
-        assert_eq!("aCBA", super::merge("c", "CaCBA"));
-        assert_eq!("CaCBA", super::merge("", "CaCBA"));
-        assert_eq!("dabA", super::merge("dabAc", "C"));
-        assert_eq!("dabAc", super::merge("dabAc", ""));
-    }
-
 }
