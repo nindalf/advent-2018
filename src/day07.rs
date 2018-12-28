@@ -19,10 +19,16 @@ impl Node {
             dependencies: HashSet::new(),
         }
     }
+
+    fn cost(&self, base_cost: u32) -> u32 {
+        (self.id as u32) - ('A' as u32) + base_cost
+    }
 }
 
 struct Graph {
     nodes: HashMap<char, Node>,
+    completed: HashSet<char>,
+    exec_queue: BinaryHeap<nchar>,
 }
 
 impl Graph {
@@ -45,44 +51,100 @@ impl Graph {
                 .or_insert_with(|| Node::new(destination));
             destination_node.dependencies.insert(source);
         }
-        Graph { nodes }
+        let completed = HashSet::new();
+        let mut exec_queue: BinaryHeap<nchar> = BinaryHeap::new();
+
+        nodes
+            .values()
+            .filter(|node| node.dependencies.len() == 0)
+            .for_each(|node| exec_queue.push(nchar(node.id)));
+
+        Graph {
+            nodes,
+            completed,
+            exec_queue,
+        }
     }
 
     #[allow(dead_code)]
-    fn execution_order(&self) -> String {
-        let mut completed: HashSet<char> = HashSet::with_capacity(self.nodes.len());
+    fn execution_order(&mut self) -> String {
         let mut result: Vec<char> = Vec::with_capacity(self.nodes.len());
-        let mut queue: BinaryHeap<nchar> = BinaryHeap::new();
+        while let Some(node_id) = self.next() {
+            self.complete_node(node_id);
+            result.push(node_id);
+        }
+        result.iter().collect()
+    }
 
-        self.nodes
-            .values()
-            .filter(|node| node.dependencies.len() == 0)
-            .for_each(|node| queue.push(nchar(node.id)));
-
-        while let Some(nc) = queue.pop() {
-            let next: char = nc.0;
-            completed.insert(next);
-            result.push(next);
-
-            let node = self.nodes.get(&next).unwrap();
-
-            for unlock in node.unlocks.iter() {
-                let unlocked_node = self.nodes.get(&unlock).unwrap();
-                let is_ready = unlocked_node
-                    .dependencies
-                    .iter()
-                    .all(|d| completed.contains(d));
-                if is_ready {
-                    let nc = nchar(*unlock);
-                    queue.push(nc);
+    #[allow(dead_code, unused_variables)]
+    fn execution_time(&mut self, num_workers: usize, base_cost: u32) -> u32 {
+        let mut time: u32 = 1;
+        let mut workers: Vec<(char, u32)> = vec![('.', 0); num_workers];
+        loop {
+            let mut free_workers = 0;
+            // check if worker is free and assign if so
+            for i in 0..workers.len() {
+                if workers[i].0 == '.' {
+                    match self.next() {
+                        Some(node_id) => {
+                            let node = self.nodes.get(&node_id).unwrap();
+                            let completion_time = time + node.cost(base_cost);
+                            workers[i] = (node_id, completion_time);
+                        }
+                        None => {
+                            free_workers += 1;
+                        }
+                    };
                 }
             }
+            // if all workers are idle, there is no work left
+            if free_workers == workers.len() {
+                break;
+            }
+            // check if worker has completed their work
+            for i in 0..workers.len() {
+                if time >= workers[i].1 && '.' != workers[i].0 {
+                    self.complete_node(workers[i].0);
+                    workers[i] = ('.', 0);
+                }
+            }
+            // time moves on
+            time = time + 1;
         }
+        time - 1
+    }
 
-        result.iter().collect()
+    fn complete_node(&mut self, node_id: char) {
+        self.completed.insert(node_id);
+        let node = self.nodes.get(&node_id).unwrap();
+        for unlock in node.unlocks.iter() {
+            let unlocked_node = self.nodes.get(&unlock).unwrap();
+            let is_ready = unlocked_node
+                .dependencies
+                .iter()
+                .all(|d| self.completed.contains(d));
+            if is_ready {
+                let nc = nchar(*unlock);
+                self.exec_queue.push(nc);
+            }
+        }
     }
 }
 
+impl Iterator for Graph {
+    type Item = char;
+
+    fn next(&mut self) -> Option<char> {
+        match self.exec_queue.pop() {
+            Some(nc) => Some(nc.0),
+            None => None,
+        }
+    }
+}
+
+// nchar is a newtype of char
+// the only thing it does is reversing the order of comparison
+// this makes the max-heap BinaryHeap into a min-heap
 #[allow(non_camel_case_types)]
 #[derive(Debug, Eq, PartialEq, Hash, Copy, Clone)]
 struct nchar(pub char);
@@ -107,7 +169,7 @@ impl PartialOrd for nchar {
 
 #[cfg(test)]
 mod tests {
-    use super::Graph;
+    use super::{Graph, Node};
 
     #[test]
     fn test_grid() {
@@ -129,11 +191,28 @@ mod tests {
 
     #[test]
     fn test_execution_order() {
-        let graph = Graph::new(TEST_INPUT);
+        let mut graph = Graph::new(TEST_INPUT);
         assert_eq!("CABDFE", graph.execution_order());
 
-        let graph = Graph::new(REAL_INPUT);
+        let mut graph = Graph::new(REAL_INPUT);
         assert_eq!("BHMOTUFLCPQKWINZVRXAJDSYEG", graph.execution_order());
+    }
+
+    #[test]
+    fn test_execution_time() {
+        let mut graph = Graph::new(TEST_INPUT);
+        assert_eq!(15, graph.execution_time(2, 0));
+        let mut graph = Graph::new(REAL_INPUT);
+        assert_eq!(877, graph.execution_time(5, 60));
+    }
+
+    #[test]
+
+    fn test_cost() {
+        let node_a = Node::new('A');
+        assert_eq!(101, node_a.cost(100));
+        let node_z = Node::new('Z');
+        assert_eq!(126, node_z.cost(100));
     }
 
     const TEST_INPUT: &'static str = "Step C must be finished before step A can begin.
