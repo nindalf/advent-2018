@@ -8,14 +8,15 @@ struct Tree {
 #[derive(Debug)]
 struct Node {
     headers: Vec<u32>,
-    children: Vec<Box<Node>>,
+    children: Vec<Node>,
+    size: usize,
 }
 
 impl Tree {
     #[allow(dead_code)]
     fn new(s: &str) -> Tree {
         let numbers: Vec<u32> = s.split(' ').map(|s| u32::from_str(s).unwrap()).collect();
-        let (root, _) = Node::new(&numbers);
+        let root = Node::new(&numbers[..]);
         Tree { root }
     }
 
@@ -31,27 +32,24 @@ impl Tree {
 }
 
 impl Node {
-    fn new(numbers: &Vec<u32>) -> (Node, Vec<u32>) {
+    fn new(numbers: &[u32]) -> Node {
         let num_children = numbers[0];
         let num_headers = numbers[1] as usize;
-        let mut children: Vec<Box<Node>> = vec![];
-        let mut remaining_numbers = numbers.iter().skip(2).map(|&x| x).collect();
+        let mut size: usize = 2;
+
+        let mut children: Vec<Node> = vec![];
         for _ in 0..num_children {
-            let (child, remaining) = Node::new(&remaining_numbers);
-            children.push(Box::new(child));
-            remaining_numbers = remaining;
+            let child = Node::new(&numbers[size..]);
+            size += child.size;
+            children.push(child);
         }
-        let headers = remaining_numbers
-            .iter()
-            .take(num_headers)
-            .map(|&x| x)
-            .collect();
-        remaining_numbers = remaining_numbers
-            .iter()
-            .skip(num_headers)
-            .map(|&x| x)
-            .collect();
-        (Node { headers, children }, remaining_numbers)
+        let headers = numbers[size..size + num_headers].to_vec();
+        size += num_headers;
+        Node {
+            headers,
+            children,
+            size,
+        }
     }
 
     fn recursive_sum(&self) -> u32 {
