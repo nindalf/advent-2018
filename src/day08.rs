@@ -69,9 +69,7 @@ impl Node {
         self.headers
             .iter()
             .map(|header| *header as usize - 1)
-            .map(|index| self.children.get(index))
-            .filter(|opt_node| opt_node.is_some())
-            .map(|opt_node| opt_node.unwrap())
+            .filter_map(|index| self.children.get(index))
             .map(|node| node.value())
             .sum()
     }
