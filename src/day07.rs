@@ -51,12 +51,13 @@ impl Graph {
                 .or_insert_with(|| Node::new(destination));
             destination_node.dependencies.insert(source);
         }
-        let completed = HashSet::new();
-        let mut exec_queue: BinaryHeap<nchar> = BinaryHeap::new();
 
+        let completed = HashSet::new();
+
+        let mut exec_queue: BinaryHeap<nchar> = BinaryHeap::new();
         nodes
             .values()
-            .filter(|node| node.dependencies.len() == 0)
+            .filter(|node| node.dependencies.is_empty())
             .for_each(|node| exec_queue.push(nchar(node.id)));
 
         Graph {
@@ -78,40 +79,46 @@ impl Graph {
 
     #[allow(dead_code)]
     fn execution_time(&mut self, num_workers: usize, base_cost: u32) -> u32 {
-        let mut time: u32 = 1;
-        let mut workers: Vec<(char, u32)> = vec![('.', 0); num_workers];
+        let mut time: u32 = 0;
+        let mut workers: Vec<WorkerStatus> = vec![WorkerStatus::Idle; num_workers];
         loop {
-            let mut free_workers = 0;
             // check if worker is free and assign if so
             for i in 0..workers.len() {
-                if workers[i].0 == '.' {
+                if workers[i] == WorkerStatus::Idle {
                     match self.next() {
                         Some(node_id) => {
                             let node = self.nodes.get(&node_id).unwrap();
                             let completion_time = time + node.cost(base_cost);
-                            workers[i] = (node_id, completion_time);
+                            workers[i] = WorkerStatus::Working(node_id, completion_time);
                         }
-                        None => {
-                            free_workers += 1;
-                        }
+                        None => (),
                     };
                 }
             }
             // if all workers are idle, there is no work left
+            let free_workers = workers
+                .iter()
+                .filter(|status| **status == WorkerStatus::Idle)
+                .count();
             if free_workers == workers.len() {
                 break;
             }
             // check if worker has completed their work
             for i in 0..workers.len() {
-                if time >= workers[i].1 && '.' != workers[i].0 {
-                    self.complete_node(workers[i].0);
-                    workers[i] = ('.', 0);
+                match workers[i] {
+                    WorkerStatus::Idle => (),
+                    WorkerStatus::Working(node, completion_time) => {
+                        if time >= completion_time {
+                            self.complete_node(node);
+                            workers[i] = WorkerStatus::Idle;
+                        }
+                    }
                 }
             }
             // time moves on
             time = time + 1;
         }
-        time - 1
+        time
     }
 
     fn complete_node(&mut self, node_id: char) {
@@ -167,6 +174,12 @@ impl PartialOrd for nchar {
     }
 }
 
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+enum WorkerStatus {
+    Idle,
+    Working(char, u32),
+}
+
 #[cfg(test)]
 mod tests {
     use super::{Graph, Node};
@@ -177,13 +190,13 @@ mod tests {
         assert_eq!(6, graph.nodes.len());
         let node_c = graph.nodes.get(&'C').unwrap();
         let node_e = graph.nodes.get(&'E').unwrap();
-        assert_eq!(0, node_c.dependencies.len());
+        assert_eq!(true, node_c.dependencies.is_empty());
         assert_eq!(2, node_c.unlocks.len());
         assert_eq!(true, node_c.unlocks.contains(&'A'));
         assert_eq!(true, node_c.unlocks.contains(&'F'));
 
         assert_eq!(3, node_e.dependencies.len());
-        assert_eq!(0, node_e.unlocks.len());
+        assert_eq!(true, node_e.unlocks.is_empty());
         assert_eq!(true, node_e.dependencies.contains(&'B'));
         assert_eq!(true, node_e.dependencies.contains(&'D'));
         assert_eq!(true, node_e.dependencies.contains(&'F'));

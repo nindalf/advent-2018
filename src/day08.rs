@@ -63,7 +63,7 @@ impl Node {
     }
 
     fn value(&self) -> u32 {
-        if self.children.len() == 0 {
+        if self.children.is_empty() {
             return self.headers.iter().sum();
         }
         self.headers
