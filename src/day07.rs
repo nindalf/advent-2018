@@ -76,7 +76,7 @@ impl Graph {
         result.iter().collect()
     }
 
-    #[allow(dead_code, unused_variables)]
+    #[allow(dead_code)]
     fn execution_time(&mut self, num_workers: usize, base_cost: u32) -> u32 {
         let mut time: u32 = 1;
         let mut workers: Vec<(char, u32)> = vec![('.', 0); num_workers];
@@ -210,9 +210,9 @@ mod tests {
 
     fn test_cost() {
         let node_a = Node::new('A');
-        assert_eq!(101, node_a.cost(100));
+        assert_eq!(100, node_a.cost(100));
         let node_z = Node::new('Z');
-        assert_eq!(126, node_z.cost(100));
+        assert_eq!(125, node_z.cost(100));
     }
 
     const TEST_INPUT: &'static str = "Step C must be finished before step A can begin.
