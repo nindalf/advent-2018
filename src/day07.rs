@@ -14,7 +14,7 @@ struct Node {
 impl Node {
     fn new(id: char) -> Node {
         Node {
-            id: id,
+            id,
             unlocks: HashSet::new(),
             dependencies: HashSet::new(),
         }
@@ -27,7 +27,6 @@ impl Node {
 
 struct Graph {
     nodes: HashMap<char, Node>,
-    completed: HashSet<char>,
     exec_queue: BinaryHeap<nchar>,
 }
 
@@ -52,19 +51,13 @@ impl Graph {
             destination_node.dependencies.insert(source);
         }
 
-        let completed = HashSet::new();
-
         let mut exec_queue: BinaryHeap<nchar> = BinaryHeap::new();
         nodes
             .values()
             .filter(|node| node.dependencies.is_empty())
             .for_each(|node| exec_queue.push(nchar(node.id)));
 
-        Graph {
-            nodes,
-            completed,
-            exec_queue,
-        }
+        Graph { nodes, exec_queue }
     }
 
     #[allow(dead_code)]
@@ -85,14 +78,11 @@ impl Graph {
             // check if worker is free and assign if so
             for i in 0..workers.len() {
                 if workers[i] == WorkerStatus::Idle {
-                    match self.next() {
-                        Some(node_id) => {
-                            let node = self.nodes.get(&node_id).unwrap();
-                            let completion_time = time + node.cost(base_cost);
-                            workers[i] = WorkerStatus::Working(node_id, completion_time);
-                        }
-                        None => (),
-                    };
+                    if let Some(node_id) = self.next() {
+                        let node = &self.nodes[&node_id];
+                        let completion_time = time + node.cost(base_cost);
+                        workers[i] = WorkerStatus::Working(node_id, completion_time);
+                    }
                 }
             }
             // if all workers are idle, there is no work left
@@ -108,7 +98,7 @@ impl Graph {
                 match workers[i] {
                     WorkerStatus::Idle => (),
                     WorkerStatus::Working(node, completion_time) => {
-                        if time >= completion_time {
+                        if time == completion_time {
                             self.complete_node(node);
                             workers[i] = WorkerStatus::Idle;
                         }
@@ -116,21 +106,18 @@ impl Graph {
                 }
             }
             // time moves on
-            time = time + 1;
+            time += 1;
         }
         time
     }
 
     fn complete_node(&mut self, node_id: char) {
-        self.completed.insert(node_id);
-        let node = self.nodes.get(&node_id).unwrap();
-        for unlock in node.unlocks.iter() {
-            let unlocked_node = self.nodes.get(&unlock).unwrap();
-            let is_ready = unlocked_node
-                .dependencies
-                .iter()
-                .all(|d| self.completed.contains(d));
-            if is_ready {
+        let node = &self.nodes[&node_id];
+        let unlocks = node.unlocks.clone();
+        for unlock in unlocks.iter() {
+            let unlocked_node = self.nodes.get_mut(&unlock).unwrap();
+            unlocked_node.dependencies.remove(&node_id);
+            if unlocked_node.dependencies.is_empty() {
                 let nc = nchar(*unlock);
                 self.exec_queue.push(nc);
             }
@@ -228,7 +215,7 @@ mod tests {
         assert_eq!(125, node_z.cost(100));
     }
 
-    const TEST_INPUT: &'static str = "Step C must be finished before step A can begin.
+    const TEST_INPUT: &str = "Step C must be finished before step A can begin.
 Step C must be finished before step F can begin.
 Step A must be finished before step B can begin.
 Step A must be finished before step D can begin.
@@ -236,7 +223,7 @@ Step B must be finished before step E can begin.
 Step D must be finished before step E can begin.
 Step F must be finished before step E can begin.";
 
-    const REAL_INPUT: &'static str = "Step U must be finished before step A can begin.
+    const REAL_INPUT: &str = "Step U must be finished before step A can begin.
 Step F must be finished before step Z can begin.
 Step B must be finished before step J can begin.
 Step O must be finished before step R can begin.

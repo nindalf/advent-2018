@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 #[allow(dead_code)]
-fn checksum(ids: Vec<&str>) -> usize {
+fn checksum(ids: &[&str]) -> usize {
     let twos = ids.iter().filter(|s| character_counts(s, 2)).count();
 
     let threes = ids.iter().filter(|s| character_counts(s, 3)).count();
@@ -26,7 +26,7 @@ fn counts(s: &str) -> HashMap<char, usize> {
 }
 
 #[allow(dead_code)]
-fn correct_id(ids: Vec<&str>) -> String {
+fn correct_id(ids: &[&str]) -> String {
     for (i, id) in ids.iter().enumerate() {
         for id2 in ids.iter().skip(i + 1) {
             let (differences, common) = string_diff(id, id2);
@@ -56,8 +56,8 @@ mod tests {
         let test_input = vec![
             "abcdef", "bababc", "abbcde", "abcccd", "aabcdd", "abcdee", "ababab",
         ];
-        assert_eq!(12, super::checksum(test_input));
-        assert_eq!(8610, super::checksum(input.to_vec()));
+        assert_eq!(12, super::checksum(&test_input));
+        assert_eq!(8610, super::checksum(&input));
     }
 
     #[test]
@@ -65,10 +65,10 @@ mod tests {
         let test_input = vec![
             "abcde", "fghij", "fguij", "klmno", "pqrst", "axcye", "wvxyz",
         ];
-        assert_eq!(String::from("fgij"), super::correct_id(test_input));
+        assert_eq!(String::from("fgij"), super::correct_id(&test_input));
         assert_eq!(
             String::from("iosnxmfkpabcjpdywvrtahluy"),
-            super::correct_id(input.to_vec())
+            super::correct_id(&input)
         );
     }
 

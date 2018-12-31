@@ -30,7 +30,7 @@ impl Cloth {
 }
 
 #[allow(dead_code)]
-fn fill_rectangle(clothes: &Vec<Cloth>) -> HashMap<(u32, u32), i32> {
+fn fill_rectangle(clothes: &[Cloth]) -> HashMap<(u32, u32), i32> {
     let mut result = HashMap::new();
     for cloth in clothes {
         for x in cloth.start_x()..cloth.end_x() {
@@ -52,7 +52,7 @@ fn count_dupes(big_cloth: &HashMap<(u32, u32), i32>) -> u32 {
 }
 
 #[allow(dead_code)]
-fn find_perfect(clothes: &Vec<Cloth>, big_cloth: &HashMap<(u32, u32), i32>) -> i32 {
+fn find_perfect(clothes: &[Cloth], big_cloth: &HashMap<(u32, u32), i32>) -> i32 {
     let mut successes = HashMap::new();
     big_cloth.values().filter(|x| **x > 0).for_each(|x| {
         match successes.get(&x) {
@@ -92,10 +92,10 @@ fn parse_cloth(s: &str) -> Cloth {
     let length = u32::from_str(&caps["length"]).unwrap();
     let breadth = u32::from_str(&caps["breadth"]).unwrap();
     Cloth {
-        id: id,
+        id,
         coordinates: (x, y),
-        length: length,
-        breadth: breadth,
+        length,
+        breadth,
     }
 }
 
@@ -149,11 +149,11 @@ mod tests {
         static ref real_input: Vec<Cloth> = super::parse_clothes(REAL_INPUT);
     }
 
-    const TEST_INPUT: &'static str = "#1 @ 1,3: 4x4
+    const TEST_INPUT: &str = "#1 @ 1,3: 4x4
 #2 @ 3,1: 4x4
 #3 @ 5,5: 2x2";
 
-    const REAL_INPUT: &'static str = "#1 @ 527,351: 24x10
+    const REAL_INPUT: &str = "#1 @ 527,351: 24x10
 #2 @ 384,468: 27x21
 #3 @ 547,294: 19x13
 #4 @ 910,172: 19x18

@@ -16,7 +16,7 @@ fn polymer_reduction(s: &str) -> usize {
             continue;
         }
         let l = result.len();
-        let last = *result.get(l - 2).unwrap();
+        let last = result[l - 2];
         if last.to_ascii_uppercase() == c.to_ascii_uppercase() && last != c {
             result.remove(l - 1);
             result.remove(l - 2);

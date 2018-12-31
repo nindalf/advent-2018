@@ -55,7 +55,7 @@ fn most_asleep_minute(guard_naps: &HashMap<i32, Vec<Nap>>) -> i32 {
     }
     for (guard, naps) in guard_naps {
         let (minute, times) = minute_most_often_asleep(&naps);
-        let (_, worst_times) = minutes.get(&minute).unwrap();
+        let (_, worst_times) = &minutes[&minute];
         if times > *worst_times {
             minutes.insert(minute, (*guard, times));
         }
@@ -91,14 +91,14 @@ fn most_asleep_guard(guard_naps: &HashMap<i32, Vec<Nap>>) -> i32 {
     worst_guard * worst_minute as i32
 }
 
-fn minute_most_often_asleep(naps: &Vec<Nap>) -> (i32, i32) {
+fn minute_most_often_asleep(naps: &[Nap]) -> (i32, i32) {
     let mut minutes = HashMap::new();
     for i in 0..60 {
         minutes.insert(i, 0);
     }
     for nap in naps {
         for minute in nap.start.time().minute()..nap.end.time().minute() {
-            let cur = minutes.get(&minute).unwrap();
+            let cur = &minutes[&minute];
             minutes.insert(minute, cur + 1);
         }
     }
@@ -143,7 +143,7 @@ fn process_logs(s: &str) -> HashMap<i32, Vec<Nap>> {
             Err(()) => panic!("error while parsing"),
         }
     }
-    return guard_naps;
+    guard_naps
 }
 
 #[cfg(test)]
@@ -153,8 +153,8 @@ mod tests {
     fn test_process_logs() {
         let logs = super::process_logs(TEST_INPUT);
         assert_eq!(2, logs.len());
-        assert_eq!(3, logs.get(&10).unwrap().len());
-        assert_eq!(3, logs.get(&99).unwrap().len());
+        assert_eq!(3, logs[&10].len());
+        assert_eq!(3, logs[&99].len());
         assert_eq!(
             NaiveDateTime::parse_from_str("1518-11-01 00:05", "%Y-%m-%d %H:%M").unwrap(),
             logs.get(&10).unwrap().first().unwrap().start
@@ -181,7 +181,7 @@ mod tests {
         assert_eq!(56901, worst_minute);
     }
 
-    const TEST_INPUT: &'static str = "[1518-11-01 00:00] Guard #10 begins shift
+    const TEST_INPUT: &str = "[1518-11-01 00:00] Guard #10 begins shift
 [1518-11-01 00:05] falls asleep
 [1518-11-01 00:25] wakes up
 [1518-11-01 00:30] falls asleep
@@ -198,7 +198,7 @@ mod tests {
 [1518-11-05 00:03] Guard #99 begins shift
 [1518-11-05 00:45] falls asleep
 [1518-11-05 00:55] wakes up";
-    const REAL_INPUT: &'static str = "[1518-09-17 23:48] Guard #1307 begins shift
+    const REAL_INPUT: &str = "[1518-09-17 23:48] Guard #1307 begins shift
 [1518-06-03 00:00] Guard #3217 begins shift
 [1518-07-28 00:49] falls asleep
 [1518-03-30 00:57] falls asleep

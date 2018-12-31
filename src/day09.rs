@@ -24,7 +24,7 @@ impl Board {
         let mut current_player = 2;
         self.marbles.push(0);
         self.marbles.push(1);
-        for marble in 2..self.last_marble + 1 {
+        for marble in 2..=self.last_marble {
             current_player = (current_player + 1) % self.num_players;
 
             if marble % 23 == 0 {

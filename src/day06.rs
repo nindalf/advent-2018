@@ -115,7 +115,7 @@ impl Point {
         Point { x, y }
     }
 
-    fn nearest_point(&self, points: &Vec<Point>) -> Option<Point> {
+    fn nearest_point(&self, points: &[Point]) -> Option<Point> {
         let mut min_distance = usize::max_value();
         let mut closest: Option<Point> = None;
         for point in points.iter() {
@@ -128,10 +128,10 @@ impl Point {
                 min_distance = distance;
             }
         }
-        return closest;
+        closest
     }
 
-    fn total_distance(&self, points: &Vec<Point>) -> usize {
+    fn total_distance(&self, points: &[Point]) -> usize {
         points.iter().map(|point| self.distance(point)).sum()
     }
 
@@ -170,13 +170,13 @@ mod tests {
         assert_eq!(40495, grid.largest_safe_area(10000));
     }
 
-    const TEST_INPUT: &'static str = "1, 1
+    const TEST_INPUT: &str = "1, 1
 1, 6
 8, 3
 3, 4
 5, 5
 8, 9";
-    const REAL_INPUT: &'static str = "342, 203
+    const REAL_INPUT: &str = "342, 203
 79, 64
 268, 323
 239, 131

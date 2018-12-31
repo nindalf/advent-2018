@@ -72,8 +72,8 @@ impl Sky {
         self.length = (max_x - min_x + 1).abs();
         self.breadth = (max_y - min_y + 1).abs();
 
-        self.offset_x = -1 * min_x;
-        self.offset_y = -1 * min_y;
+        self.offset_x = -min_x;
+        self.offset_y = -min_y;
     }
 
     #[allow(dead_code)]
@@ -104,7 +104,7 @@ impl Display for Sky {
             (self.length + 1) * self.breadth
         );
         let mut grid = vec!['.'; ((self.length + 1) * self.breadth) as usize];
-        for i in 1..self.breadth + 1 {
+        for i in 1..=self.breadth {
             grid[((self.length + 1) * i - 1) as usize] = '\n';
         }
         self.stars
@@ -180,7 +180,7 @@ mod tests {
         assert_eq!(REAL_MESSAGE, sky.to_string());
     }
 
-    const TEST_INPUT: &'static str = "position=< 9,  1> velocity=< 0,  2>
+    const TEST_INPUT: &str = "position=< 9,  1> velocity=< 0,  2>
 position=< 7,  0> velocity=<-1,  0>
 position=< 3, -2> velocity=<-1,  1>
 position=< 6, 10> velocity=<-2, -1>
@@ -212,7 +212,7 @@ position=< 5,  9> velocity=< 1, -2>
 position=<14,  7> velocity=<-2,  0>
 position=<-3,  6> velocity=< 2, -1>";
 
-    const TEST_SKY: &'static str = "........#.............
+    const TEST_SKY: &str = "........#.............
 ................#.....
 .........#.#..#.......
 ......................
@@ -230,7 +230,7 @@ position=<-3,  6> velocity=< 2, -1>";
 ...#.......#..........
 ";
 
-    const TEST_MESSAGE: &'static str = "#...#..###
+    const TEST_MESSAGE: &str = "#...#..###
 #...#...#.
 #...#...#.
 #####...#.
@@ -240,7 +240,7 @@ position=<-3,  6> velocity=< 2, -1>";
 #...#..###
 ";
 
-    const REAL_INPUT: &'static str = "position=<-52592,  31869> velocity=< 5, -3>
+    const REAL_INPUT: &str = "position=<-52592,  31869> velocity=< 5, -3>
 position=<-20934,  52988> velocity=< 2, -5>
 position=<-20910,  31871> velocity=< 2, -3>
 position=<-31503, -52596> velocity=< 3,  5>
@@ -627,7 +627,7 @@ position=<-42053, -52592> velocity=< 4,  5>
 position=<-31490,  10750> velocity=< 3, -1>
 ";
 
-    const REAL_MESSAGE: &'static str =
+    const REAL_MESSAGE: &str =
         "#....#..#####...#....#..######..######..#....#...####......###
 ##...#..#....#..#....#..#............#..#....#..#....#......#.
 ##...#..#....#..#....#..#............#..#....#..#...........#.

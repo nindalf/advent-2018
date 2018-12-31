@@ -1,17 +1,17 @@
 use std::collections::HashSet;
 
 #[allow(dead_code)]
-fn compute_sum(input: &Vec<i32>) -> i32 {
+fn compute_sum(input: &[i32]) -> i32 {
     input.iter().sum()
 }
 
 #[allow(dead_code)]
-fn compute_dupe_freq(input: &Vec<i32>) -> i32 {
+fn compute_dupe_freq(input: &[i32]) -> i32 {
     let mut sum = 0;
     let len = input.len();
     let mut set: HashSet<i32> = HashSet::new();
     for i in 0.. {
-        sum += input.get(i % len).unwrap();
+        sum += input[i % len];
         if set.contains(&sum) {
             break;
         }
