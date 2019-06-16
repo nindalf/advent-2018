@@ -98,8 +98,8 @@ fn minute_most_often_asleep(naps: &[Nap]) -> (i32, i32) {
     }
     for nap in naps {
         for minute in nap.start.time().minute()..nap.end.time().minute() {
-            let cur = &minutes[&minute];
-            minutes.insert(minute, cur + 1);
+            minutes.entry(minute)
+                .and_modify(|cur| *cur = *cur + 1);
         }
     }
     let mut high_naps = 0;
@@ -130,14 +130,9 @@ fn process_logs(s: &str) -> HashMap<i32, Vec<Nap>> {
                     end: time,
                 };
                 let guard = current_guard.unwrap();
-                match guard_naps.get_mut(&guard) {
-                    Some(v) => {
-                        v.push(nap);
-                    }
-                    None => {
-                        guard_naps.insert(guard, vec![nap]);
-                    }
-                }
+                guard_naps.entry(guard)
+                    .or_default()
+                    .push(nap);
                 start_time = None;
             }
             Err(()) => panic!("error while parsing"),

@@ -30,10 +30,13 @@ impl Board {
             if marble % 23 == 0 {
                 current_index = (self.marbles.len() + current_index - 7) % self.marbles.len();
                 let score = marble + self.marbles.remove(current_index);
-                match self.scores.get(&current_player) {
-                    Some(n) => self.scores.insert(current_player, score + n),
-                    None => self.scores.insert(current_player, score),
-                };
+                self.scores.entry(current_player)
+                    .and_modify(|n| *n = *n + score)
+                    .or_insert(score);
+                // match self.scores.get(&current_player) {
+                //     Some(n) => self.scores.insert(current_player, score + n),
+                //     None => self.scores.insert(current_player, score),
+                // };
                 continue;
             }
 

@@ -17,10 +17,9 @@ fn character_counts(s: &str, n: usize) -> bool {
 fn counts(s: &str) -> HashMap<char, usize> {
     let mut result: HashMap<char, usize> = HashMap::new();
     for c in s.chars() {
-        match result.get(&c) {
-            Some(cur) => result.insert(c, cur + 1),
-            None => result.insert(c, 1),
-        };
+        result.entry(c)
+            .and_modify(|cur| *cur = *cur + 1)
+            .or_insert(1);
     }
     result
 }

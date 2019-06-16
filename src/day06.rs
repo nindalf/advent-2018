@@ -53,13 +53,10 @@ impl Grid {
                 let nearest = tile.unwrap();
                 if self.is_edge(i, j) {
                     result.remove(&nearest);
-                }
-                let r = result.get(&nearest);
-                if r.is_none() {
                     continue;
                 }
-                let times = r.unwrap();
-                result.insert(nearest, times + 1);
+                result.entry(nearest)
+                    .and_modify(|times| *times = *times + 1);
             }
         }
         *result.values().max().unwrap()
