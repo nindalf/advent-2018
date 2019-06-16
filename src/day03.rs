@@ -108,18 +108,18 @@ mod tests {
 
     #[test]
     fn test_dupes() {
-        let big_cloth = super::fill_rectangle(&test_input);
+        let big_cloth = super::fill_rectangle(&PARSED_TEST_INPUT);
         assert_eq!(4, super::count_dupes(&big_cloth));
-        let big_cloth = super::fill_rectangle(&real_input);
+        let big_cloth = super::fill_rectangle(&PARSED_REAL_INPUT);
         assert_eq!(112378, super::count_dupes(&big_cloth));
     }
 
     #[test]
     fn test_perfect() {
-        let big_cloth = super::fill_rectangle(&test_input);
-        assert_eq!(3, super::find_perfect(&test_input, &big_cloth));
-        let big_cloth = super::fill_rectangle(&real_input);
-        assert_eq!(603, super::find_perfect(&real_input, &big_cloth));
+        let big_cloth = super::fill_rectangle(&PARSED_TEST_INPUT);
+        assert_eq!(3, super::find_perfect(&PARSED_TEST_INPUT, &big_cloth));
+        let big_cloth = super::fill_rectangle(&PARSED_REAL_INPUT);
+        assert_eq!(603, super::find_perfect(&PARSED_REAL_INPUT, &big_cloth));
     }
 
     #[test]
@@ -148,8 +148,8 @@ mod tests {
     }
 
     lazy_static! {
-        static ref test_input: Vec<Cloth> = super::parse_clothes(TEST_INPUT);
-        static ref real_input: Vec<Cloth> = super::parse_clothes(REAL_INPUT);
+        static ref PARSED_TEST_INPUT: Vec<Cloth> = super::parse_clothes(TEST_INPUT);
+        static ref PARSED_REAL_INPUT: Vec<Cloth> = super::parse_clothes(REAL_INPUT);
     }
 
     const TEST_INPUT: &str = "#1 @ 1,3: 4x4

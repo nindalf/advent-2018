@@ -56,7 +56,7 @@ mod tests {
             "abcdef", "bababc", "abbcde", "abcccd", "aabcdd", "abcdee", "ababab",
         ];
         assert_eq!(12, super::checksum(&test_input));
-        assert_eq!(8610, super::checksum(&input));
+        assert_eq!(8610, super::checksum(&INPUT));
     }
 
     #[test]
@@ -67,7 +67,7 @@ mod tests {
         assert_eq!(String::from("fgij"), super::correct_id(&test_input));
         assert_eq!(
             String::from("iosnxmfkpabcjpdywvrtahluy"),
-            super::correct_id(&input)
+            super::correct_id(&INPUT)
         );
     }
 
@@ -89,7 +89,7 @@ mod tests {
     }
 
     lazy_static! {
-        static ref input: Vec<&'static str> = vec![
+        static ref INPUT: Vec<&'static str> = vec![
             "uosnxmfkezbojfdgwvrtaqhluy",
             "iosnxmfkazbcopdgnvrtaqhluy",
             "ioanxmfkezbcjpdgwvrjaohluy",
