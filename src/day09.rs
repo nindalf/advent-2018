@@ -33,10 +33,6 @@ impl Board {
                 self.scores.entry(current_player)
                     .and_modify(|n| *n = *n + score)
                     .or_insert(score);
-                // match self.scores.get(&current_player) {
-                //     Some(n) => self.scores.insert(current_player, score + n),
-                //     None => self.scores.insert(current_player, score),
-                // };
                 continue;
             }
 

@@ -58,10 +58,6 @@ fn find_perfect(clothes: &[Cloth], big_cloth: &HashMap<(u32, u32), i32>) -> i32 
         successes.entry(x)
             .and_modify(|cur| *cur = *cur + 1)
             .or_insert(1);
-        // match successes.get(&x) {
-        //     Some(cur) => successes.insert(x, cur + 1),
-        //     None => successes.insert(x, 1),
-        // };
     });
     for cloth in clothes {
         match successes.get(&cloth.id) {
